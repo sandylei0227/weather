@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather</title>
+</head>
+<style>
+    .head {
+        font-family: "Helvetica", "Arial", "黑體-繁", "微軟正黑體", sans-serif;
+        font-size: 30px;
+        font-weight: 900;
+        text-align: center;
+        color: aliceblue;
+        background-image: linear-gradient(to right, #c2d8e4, #0c91f0);
+        padding: 20px;
+        height: 80px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+    }
+
+    .county {
+        background-color: gold;
+        height: 45px;
+    }
+
+    .title-1 {
+        font-family: "Helvetica", "Arial", "黑體-繁", "微軟正黑體", sans-serif;
+        font-size: 22px;
+        font-weight: 600;
+        color: black;
+        padding: 10px;
+    }
+
+    .title-2 {
+        font-family: "Helvetica", "Arial", "黑體-繁", "微軟正黑體", sans-serif;
+        font-size: 20px;
+        font-weight: 600;
+        color: black;
+        padding: 10px;
+    }
+
+    .title-3 {
+        font-family: "Helvetica", "Arial", "黑體-繁", "微軟正黑體", sans-serif;
+        font-size: 20px;
+        font-weight: 600;
+        color: whitesmoke;
+        padding: 10px;
+        height: 25px;
+    }
+
+    .content {
+        font-family: "Helvetica", "Arial", "黑體-繁", "微軟正黑體", sans-serif;
+        font-size: 20px;
+        font-weight: 500;
+        color: black;
+        padding: 10px;
+        background-color: antiquewhite;
+        border-bottom-style: dotted;
+        border-color: pink;
+        height: 180px;
+        overflow: auto;
+        /* 若內容超出高度，顯示捲軸 */
+    }
+
+    .footer {
+        font-family: "Helvetica", "Arial", "黑體-繁", "微軟正黑體", sans-serif;
+        background-color: rgb(198, 190, 190);
+        opacity: 0.8;
+        padding: 5px;
+        text-align: center;
+        font-size: 10px;
+        position: fixed;
+        /* 將頁尾固定在底部 */
+        bottom: 0;
+        width: 100%;
+    }
+</style>
+
+
+<body style="margin: 0px">
+    <div class="head">
+        <span>全台即時天氣預報查詢</span>
+    </div>
+    <div class="county">
+        <div class="title-2">請選擇縣市
+            <select id="mySelect" style="font-size: 16px">
+                <option value="none" selected disabled hidden>請選擇</option>
+                <optgroup label="北部地區">
+                    <option value="option1">基隆市</option>
+                    <option value="option2">臺北市</option>
+                    <option value="option3">新北市</option>
+                    <option value="option4">宜蘭縣</option>
+                    <option value="option5">桃園市</option>
+                    <option value="option6">新竹市</option>
+                    <option value="option7">新竹縣</option>
+                </optgroup>
+                <optgroup label="中部地區">
+                    <option value="option8">苗栗縣</option>
+                    <option value="option9">臺中市</option>
+                    <option value="option10">彰化縣</option>
+                    <option value="option11">南投縣</option>
+                    <option value="option12">雲林縣</option>
+                </optgroup>
+                <optgroup label="南部地區">
+                    <option value="option13">嘉義市</option>
+                    <option value="option14">嘉義縣</option>
+                    <option value="option15">臺南市</option>
+                    <option value="option16">高雄市</option>
+                    <option value="option17">屏東縣</option>
+                </optgroup>
+                <optgroup label="東部地區">
+                    <option value="option18">花蓮縣</option>
+                    <option value="option19">臺東縣</option>
+                </optgroup>
+                <optgroup label="離島地區">
+                    <option value="option20">澎湖縣</option>
+                    <option value="option21">金門縣</option>
+                    <option value="option22">連江縣</option>
+                </optgroup>
+            </select>
+            <button onclick="getWeathertData()">送出</button>
+        </div>
+    </div>
+    <div id="location" class="title-3" style="background-color: palevioletred;"></div>
+    <div id="time_0" class="content"></div>
+    <div id="time_1" class=" content"></div>
+    <div id="time_2" class=" content"></div>
+    <footer class="footer">
+        <span>source:中央氣象局開放資料平臺-今明36小時天氣預報API</span>
+        <span>&copy; 2023 LEI,YEN-CHIN. All rights reserved.</span>
+    </footer>
+
+    <script>
+        function getWeathertData() {
+
+            let src = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWB-1753375D-312E-4ED5-9C68-E43BD56F4C36"
+            let selectElement = document.querySelector('#mySelect')
+            let selectValue = selectElement.value
+            let time_0 = document.querySelector('#time_0')
+            let time_1 = document.querySelector('#time_1')
+            let time_2 = document.querySelector('#time_2')
+            let location = document.querySelector('#location')
+            fetch(src).then(function (response) {
+                return response.json()
+            }).then(function (data) {
+                // 根據所選的縣市抓氣象資料
+                // 基隆市
+                if (selectValue == "option1") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[18].locationName + "</div>";
+                    time_0.innerHTML =
+                        "<div>"
+                        + data.records.location[18].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[18].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[18].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[18].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[18].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[18].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML =
+                        "<div>"
+                        + data.records.location[18].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[18].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[18].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[18].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[18].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[18].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML =
+                        "<div>"
+                        + data.records.location[18].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[18].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[18].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[18].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[18].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[18].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>";
+                }
+                // 台北市
+                if (selectValue == "option2") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[5].locationName + "</div>";
+                    time_0.innerHTML =
+                        "<div>"
+                        + data.records.location[5].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[5].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[5].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[5].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[5].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[5].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML =
+                        "<div>"
+                        + data.records.location[5].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[5].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[5].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[5].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[5].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[5].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML =
+                        "<div>"
+                        + data.records.location[5].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[5].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[5].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[5].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[5].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[5].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    // 新北市
+                } if (selectValue == "option3") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[1].locationName + "</div>";
+                    time_0.innerHTML =
+                        "<div>"
+                        + data.records.location[1].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[1].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[1].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[1].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[1].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[1].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[1].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[1].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[1].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[1].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[1].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[1].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[1].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[1].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[1].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[1].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[1].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[1].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                // 宜蘭縣4
+                if (selectValue == "option4") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[7].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[7].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[7].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[7].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[7].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[7].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[7].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[7].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[7].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[7].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[7].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[7].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[7].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[7].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[7].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[7].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[7].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[7].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[7].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                // 桃園市5
+                if (selectValue == "option5") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[13].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[13].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[13].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[13].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[13].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[13].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[13].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[13].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[13].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[13].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[13].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[13].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[13].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[13].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[13].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[13].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[13].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[13].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[13].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                // 新竹市6
+                if (selectValue == "option6") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[4].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[4].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[4].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[4].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[4].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[4].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[4].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[4].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[4].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[4].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[4].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[4].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[4].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[4].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[4].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[4].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[4].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[4].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[4].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                // 新竹縣7
+                if (selectValue == "option7") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[3].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[3].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[3].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[3].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[3].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[3].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[3].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[3].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[3].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[3].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[3].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[3].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[3].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[3].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[3].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[3].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[3].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[3].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[3].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                // <option value="option8">苗栗縣</option>
+                if (selectValue == "option8") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[8].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[8].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[8].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[8].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[8].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[8].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[8].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[8].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[8].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[8].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[8].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[8].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[8].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[8].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[8].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[8].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[8].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[8].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[8].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                // <option value="option9">臺中市</option>
+                if (selectValue == "option9") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[11].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[11].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[11].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[11].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[11].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[11].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[11].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[11].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[11].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[11].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[11].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[11].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[11].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[11].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[11].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[11].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[11].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[11].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[11].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                // <option value="option10">彰化縣</option>
+                if (selectValue == "option10") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[20].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[20].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[20].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[20].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[20].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[20].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[20].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[20].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[20].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[20].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[20].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[20].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[20].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[20].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[20].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[20].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[20].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[20].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[20].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                // <option value="option11">南投縣</option>
+                if (selectValue == "option11") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[14].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[14].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[14].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[14].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[14].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[14].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[14].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[14].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[14].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[14].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[14].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[14].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[14].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[14].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[14].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[14].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[14].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[14].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[14].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                // <option value="option12">雲林縣</option>
+                if (selectValue == "option12") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[9].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[9].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[9].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[9].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[9].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[9].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[9].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[9].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[9].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[9].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[9].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[9].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[9].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[9].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[9].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[9].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[9].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[9].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[9].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+
+                // <option value="option13">嘉義市</option>
+                if (selectValue == "option13") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[2].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[2].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[2].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[2].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[2].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[2].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[2].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[2].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[2].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[2].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[2].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[2].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[2].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[2].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[2].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[2].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[2].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[2].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[2].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                // <option value="option14">嘉義縣</option>
+                if (selectValue == "option14") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[0].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[0].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[0].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[0].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[0].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[0].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[0].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[0].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[0].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[0].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[0].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[0].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[0].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[0].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[0].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[0].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[0].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[0].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[0].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                // <option value="option15">臺南市</option>
+                if (selectValue == "option15") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[6].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[6].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[6].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[6].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[6].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[6].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[6].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[6].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[6].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[6].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[6].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[6].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[6].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[6].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[6].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[6].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[6].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[6].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[6].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                // <option value="option16">高雄市</option>
+                if (selectValue == "option16") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[15].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[15].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[15].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[15].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[15].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[15].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[15].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[15].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[15].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[15].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[15].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[15].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[15].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[15].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[15].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[15].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[15].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[15].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[15].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                // <option value="option17">屏東縣</option>
+                if (selectValue == "option17") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[17].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[17].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[17].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[17].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[17].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[17].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[17].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[17].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[17].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[17].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[17].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[17].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[17].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[17].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[17].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[17].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[17].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[17].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[17].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+
+                // <option value="option18">花蓮縣</option>
+                if (selectValue == "option18") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[10].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[10].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[10].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[10].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[10].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[10].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[10].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[10].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[10].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[10].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[10].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[10].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[10].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[10].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[10].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[10].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[10].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[10].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[10].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                // <option value="option19">臺東縣</option>
+                if (selectValue == "option19") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[12].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[12].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[12].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[12].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[12].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[12].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[12].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[12].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[12].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[12].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[12].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[12].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[12].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[12].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[12].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[12].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[12].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[12].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[12].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+
+                //  <option value="option20">澎湖縣</option>
+                if (selectValue == "option20") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[19].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[19].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[19].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[19].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[19].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[19].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[19].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[19].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[19].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[19].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[19].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[19].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[19].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[19].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[19].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[19].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[19].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[19].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[19].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                //  <option value="option21">金門縣</option>
+                if (selectValue == "option21") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[16].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[16].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[16].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[16].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[16].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[16].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[16].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[16].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[16].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[16].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[16].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[16].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[16].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[16].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[16].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[16].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[16].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[16].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[16].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+                //  <option value="option22">連江縣</option>
+                if (selectValue == "option22") {
+                    location.innerHTML = "<div>"
+                        + data.records.location[21].locationName + "</div>";
+                    time_0.innerHTML = "<div>"
+                        + data.records.location[21].weatherElement[0].time[0].startTime
+                        + " ~ "
+                        + data.records.location[21].weatherElement[0].time[0].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[21].weatherElement[0].time[0].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[21].weatherElement[1].time[0].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[21].weatherElement[2].time[0].parameter.parameterName
+                        + "~"
+                        + data.records.location[21].weatherElement[4].time[0].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_1.innerHTML = "<div>"
+                        + data.records.location[21].weatherElement[0].time[1].startTime
+                        + " ~ "
+                        + data.records.location[21].weatherElement[0].time[1].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[21].weatherElement[0].time[1].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[21].weatherElement[1].time[1].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[21].weatherElement[2].time[1].parameter.parameterName
+                        + "~"
+                        + data.records.location[21].weatherElement[4].time[1].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                    time_2.innerHTML = "<div>"
+                        + data.records.location[21].weatherElement[0].time[2].startTime
+                        + " ~ "
+                        + data.records.location[21].weatherElement[0].time[2].endTime
+                        + "<br>"
+                        + "<br>"
+                        + "天氣現象:"
+                        + data.records.location[21].weatherElement[0].time[2].parameter.parameterName
+                        + "<br>"
+                        + "降雨機率:"
+                        + data.records.location[21].weatherElement[1].time[2].parameter.parameterName
+                        + "%"
+                        + "<br>"
+                        + "氣溫:"
+                        + data.records.location[21].weatherElement[2].time[2].parameter.parameterName
+                        + "~"
+                        + data.records.location[21].weatherElement[4].time[2].parameter.parameterName
+                        + "度"
+                        + "</div>"
+                }
+            })
+
+        }
+    </script>
+
+</body>
+
+</html>
